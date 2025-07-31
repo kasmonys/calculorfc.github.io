@@ -1,0 +1,92 @@
+
+#include <iostream>
+#include <string>
+#include <cctype>
+
+using namespace std;
+
+class Empleado {
+private:
+    string nombre;
+    string apellidoPaterno;
+    string apellidoMaterno;
+    int dia, mes, anio;
+
+    // Función para obtener primera vocal interna del apellido paterno
+    char obtenerVocalInterna(const string& apellido) {
+        for (size_t i = 1; i < apellido.length(); ++i) {
+            char c = toupper(apellido[i]);
+            if (c == 'A' || c == 'E' || c == 'I' || c == 'O' || c == 'U') {
+                return c;
+            }
+        }
+        return 'X'; // Por si no hay vocal interna
+    }
+
+public:
+    // Constructor
+    Empleado(string nom, string apPat, string apMat, int d, int m, int a) {
+        nombre = nom;
+        apellidoPaterno = apPat;
+        apellidoMaterno = apMat;
+        dia = d;
+        mes = m;
+        anio = a;
+    }
+
+    string calcularRFC() {
+        string rfc = "";
+
+        // Primeras 2 letras: primera letra y primera vocal interna del apellido paterno
+        rfc += toupper(apellidoPaterno[0]);
+        rfc += obtenerVocalInterna(apellidoPaterno);
+
+        // Inicial del apellido materno (o X si no tiene)
+        if (apellidoMaterno.length() > 0)
+            rfc += toupper(apellidoMaterno[0]);
+        else
+            rfc += 'X';
+
+        // Inicial del primer nombre
+        rfc += toupper(nombre[0]);
+
+        // Año (últimos 2 dígitos)
+        rfc += to_string(anio).substr(2, 2);
+
+        // Mes (2 dígitos)
+        if (mes < 10) rfc += '0';
+        rfc += to_string(mes);
+
+        // Día (2 dígitos)
+        if (dia < 10) rfc += '0';
+        rfc += to_string(dia);
+
+        return rfc;
+    }
+
+    void mostrarDatos() {
+        cout << "Nombre: " << nombre << " " << apellidoPaterno << " " << apellidoMaterno << endl;
+        cout << "Fecha de nacimiento: " << dia << "/" << mes << "/" << anio << endl;
+        cout << "RFC generado: " << calcularRFC() << endl;
+    }
+};
+
+int main() {
+    string nombre, apellidoP, apellidoM;
+    int dia, mes, anio;
+
+    cout << "Ingrese nombre: ";
+    getline(cin, nombre);
+    cout << "Ingrese apellido paterno: ";
+    getline(cin, apellidoP);
+    cout << "Ingrese apellido materno (dejar vacío si no tiene): ";
+    getline(cin, apellidoM);
+    cout << "Ingrese fecha de nacimiento (DD MM AAAA): ";
+    cin >> dia >> mes >> anio;
+
+    Empleado empleado(nombre, apellidoP, apellidoM, dia, mes, anio);
+    cout << "\n--- Resultado ---\n";
+    empleado.mostrarDatos();
+
+    return 0;
+}
