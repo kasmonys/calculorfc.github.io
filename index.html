@@ -1,9 +1,28 @@
-
 #include <iostream>
 #include <string>
+#include <vector>
 #include <cctype>
+#include <algorithm>
 
 using namespace std;
+
+// Diccionario de palabras no permitidas
+const vector<string> palabrasProhibidas = {
+    "PENE", "POPO", "CULO", "PUTO", "CHOTO", "CHOTA"
+};
+
+// Verificar si las primeras 4 letras del RFC forman una palabra prohibida
+string corregirRFC(const string& rfc) {
+    string inicio = rfc.substr(0, 4);
+    for (const string& palabra : palabrasProhibidas) {
+        if (inicio == palabra) {
+            // Reemplaza la cuarta letra con 'X'
+            string corregido = inicio.substr(0, 3) + 'X' + rfc.substr(4);
+            return corregido;
+        }
+    }
+    return rfc;
+}
 
 class Empleado {
 private:
@@ -20,11 +39,10 @@ private:
                 return c;
             }
         }
-        return 'X'; // Por si no hay vocal interna
+        return 'X';
     }
 
 public:
-    // Constructor
     Empleado(string nom, string apPat, string apMat, int d, int m, int a) {
         nombre = nom;
         apellidoPaterno = apPat;
@@ -37,31 +55,26 @@ public:
     string calcularRFC() {
         string rfc = "";
 
-        // Primeras 2 letras: primera letra y primera vocal interna del apellido paterno
         rfc += toupper(apellidoPaterno[0]);
         rfc += obtenerVocalInterna(apellidoPaterno);
 
-        // Inicial del apellido materno (o X si no tiene)
-        if (apellidoMaterno.length() > 0)
+        if (!apellidoMaterno.empty())
             rfc += toupper(apellidoMaterno[0]);
         else
             rfc += 'X';
 
-        // Inicial del primer nombre
         rfc += toupper(nombre[0]);
 
-        // Año (últimos 2 dígitos)
+        // Fecha de nacimiento
         rfc += to_string(anio).substr(2, 2);
 
-        // Mes (2 dígitos)
         if (mes < 10) rfc += '0';
         rfc += to_string(mes);
 
-        // Día (2 dígitos)
         if (dia < 10) rfc += '0';
         rfc += to_string(dia);
 
-        return rfc;
+        return corregirRFC(rfc);
     }
 
     void mostrarDatos() {
@@ -85,7 +98,7 @@ int main() {
     cin >> dia >> mes >> anio;
 
     Empleado empleado(nombre, apellidoP, apellidoM, dia, mes, anio);
-    cout << "\n--- Resultado ---\n";
+    cout << endl << "--- Resultado ---" << endl;
     empleado.mostrarDatos();
 
     return 0;
